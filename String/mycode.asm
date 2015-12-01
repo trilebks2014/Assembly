@@ -388,7 +388,84 @@ replaceString MACRO string1,string2,stringReplace
     exit:           ;Exit end of MACRO   
 ENDM  
 
+insertChar MACRO string, char, index      
+   MOV BX,0
+    lengthloop:
+        CMP string[bx],'$'
+        JE doneLength
+        INC BX
+        JMP lengthloop
+    doneLength:   
+    MOV DL,char
+    insertloop:
+        
+        CMP BX,index
+        JE  done   
+        ;JA exit
+        DEC BX
+        MOV DL,string[BX]
+        INC BX
+        MOV string[BX],DL
+        DEC BX
+        JMP insertloop
+   done:
+        MOV DL,char
+        MOV string[BX],DL
+   exit:     
+        
+ENDM
 
+
+deleteChar MACRO string, index 
+
+    MOV BX,index
+    DEC BX
+    deleteCharloop:       
+        CMP string[BX],'$'
+        JE deleteEndWord  
+        
+        INC BX
+        MOV DL,string[BX]
+        DEC BX
+        MOV string[BX],DL
+        INC BX
+        JMP deleteCharloop
+   deleteEndWord:
+        DEC BX
+        MOV string[BX],'$'  
+   exit:
+ENDM
+    
+    
+deleteString MACRO string, index, lengthToDelete  
+  ;  MOV BX,0
+ ;   lengthloop:
+ ;       CMP string[bx],'$'
+ ;       JE doneLength
+ ;       INC BX
+ ;       JMP lengthloop  
+ ;   CMP BX,index
+    JB exit     
+        
+    doneLength:   
+    MOV BX,index
+    DEC BX
+    deleteStringloop:
+        ADD BX,lengthToDelete
+        CMP string[BX],'$'
+        JE  addEndString      
+        SUB BX,lengthToDelete
+        ADD BX,lengthToDelete
+        MOV DL,string[BX]
+        SUB BX,lengthToDelete
+        MOV string[BX],DL
+        INC BX
+        JMP deleteStringloop
+   addEndString:
+        SUB BX,lengthToDelete
+        MOV string[BX],'$' 
+   exit:
+ENDM            
 
 DSEG SEGMENT 
     msgString1CMP DB "String1 bigger than String2 $"
@@ -403,7 +480,9 @@ DSEG SEGMENT
     result DB 30 DUP('$') 
     div10 DB 10
     findChar DB 'e'     
-    wordReplace DB 'u'
+    wordReplace DB 'u'  
+    wordInsert DB 'k'  
+
     temp DW 0  
     temp1 DW 0    
     temp2 DW 0 
@@ -413,11 +492,11 @@ DSEG SEGMENT
     lengthex1 DW 0
     enterLine DB 10,13,'$' 
     stringReplace DB 30 DUP('$')
-    string1 DB 30 DUP('$') 
-    string2 DB 30 DUP('$')
-        max DB 30
+    string1 DB 60 DUP('$') 
+    string2 DB 60 DUP('$')
+        max DB 60
         length DB ?
-        buff DB 31 DUP(?) 
+        buff DB 60 DUP(?) 
         
 DSEG ENDS
 
@@ -479,7 +558,8 @@ start:
     ;compareString string1,string2
     
     ;searchCharString string1,findChar,result
-    ;outputString result
+    ;outputString result 
+    
     ;searchStringinString string1,string2,result   
     ;reverseString result,result
     ;outputString result 
@@ -487,14 +567,14 @@ start:
     ;repaceWord string1,findChar,wordReplace      
     ;outputString string1
     
-    replaceString string1,string2,stringReplace
-        
-    ;MOV AX,6
-    ;DIV div10
+    ;replaceString string1,string2,stringReplace
     
     
+    insertChar string1,wordInsert,5    
+   
+    ;deleteChar string1,25
     
-    
+    ;deleteString string1,5,2
     
     MOV AH,4CH
     INT 21h
