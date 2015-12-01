@@ -362,7 +362,7 @@ replaceString MACRO string1,string2,stringReplace
            INC CX
            MOV BX,CX  
            CMP string2[BX],'$'
-           JE save  
+           JE replaceString  
            MOV DH,string2[BX]
            MOV BX,temp
            ADD BX,CX    
@@ -373,20 +373,22 @@ replaceString MACRO string1,string2,stringReplace
            INC BX
            JMP searchLoop
        replaceString:     
-           MOV CX,0
+           MOV CX,-1
            replaceLoop:
                INC CX 
                MOV BX,CX
                CMP string2[BX],'$'
                JE searchLoop
-               MOV DH,stringReplace[BX]
+               MOV DL,stringReplace[BX]
                MOV BX,temp
                ADD BX,CX
                MOV string1[BX],DL 
-               JMP replaceString
+               JMP replaceLoop
               
     exit:           ;Exit end of MACRO   
-ENDM     
+ENDM  
+
+
 
 DSEG SEGMENT 
     msgString1CMP DB "String1 bigger than String2 $"
@@ -397,7 +399,7 @@ DSEG SEGMENT
     msgStringEqualLonger DB "String 1 and String 2 have the same length $"
     msgInput DB "Input your string: $"
     msgOutput DB "The result is: $"   
-    stringReplay DB 30 DUP('$')
+    
     result DB 30 DUP('$') 
     div10 DB 10
     findChar DB 'e'     
@@ -409,7 +411,8 @@ DSEG SEGMENT
     length2 DW ?
     charTemp DB 0
     lengthex1 DW 0
-    enterLine DB 10,13,'$'
+    enterLine DB 10,13,'$' 
+    stringReplace DB 30 DUP('$')
     string1 DB 30 DUP('$') 
     string2 DB 30 DUP('$')
         max DB 30
@@ -437,8 +440,16 @@ start:
     inputString max  
     fixString string2    
     
+    
+    outputString enterLine  
+    outputString msgInput        
+    inputString max  
+    fixString stringReplace 
+    
+    
     outputString enterLine
     outputString msgOutput
+    
     
     
     ;reverseString string1,string2   
@@ -469,9 +480,9 @@ start:
     
     ;searchCharString string1,findChar,result
     ;outputString result
-    searchStringinString string1,string2,result   
-    reverseString result,result
-    outputString result 
+    ;searchStringinString string1,string2,result   
+    ;reverseString result,result
+    ;outputString result 
      
     ;repaceWord string1,findChar,wordReplace      
     ;outputString string1
