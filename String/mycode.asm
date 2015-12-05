@@ -466,8 +466,27 @@ deleteString MACRO string, index, lengthToDelete
         MOV string[BX],'$' 
    exit:
 ENDM            
-
-DSEG SEGMENT 
+                                    
+                                    
+DSEG SEGMENT                 
+    msgNotice1 DB "1.Input String",10,13
+    msgNotice2 DB "2.Output String ",10,13  
+    msgNotice3 DB "3.Search Char in String",10,13
+    msgNotice4 DB "4.Search String in String",10,13
+    msgNotice5 DB "5.Reserve String",10,13
+    msgNotice6 DB "6.Copy String",10,13
+    msgNotice7 DB "7.Length of String",10,13
+    msgNotice8 DB "8.Upper string",10,13
+    msgNotice9 DB "9.Lower String" ,10,13
+    msgNotice10 DB "10.Copy String",10,13
+    msgNotice11 DB "11.Cat String"  ,10,13
+    msgNotice12 DB "12.Compare String",10,13
+    msgNotice13 DB "13.Replace word" ,10,13
+    msgNotice14 DB "14.Delete word",10,13
+    msgNotice15 DB "15.Replace string" ,10,13
+    msgNotice16 DB "16.Insert char",10,13    
+    msgNotice17 DB "Select choice ... :   $"
+    
     msgString1CMP DB "String1 bigger than String2 $"
     msgString2CMP DB "String2 bigger than String1 $"
     msgStringEqualCMP DB "String1 like the same String2 $"
@@ -493,7 +512,8 @@ DSEG SEGMENT
     enterLine DB 10,13,'$' 
     stringReplace DB 30 DUP('$')
     string1 DB 60 DUP('$') 
-    string2 DB 60 DUP('$')
+    string2 DB 60 DUP('$') 
+    select DB 60 DUP('$')
         max DB 60
         length DB ?
         buff DB 60 DUP(?) 
@@ -508,26 +528,29 @@ start:
     MOV DS,AX
     MOV ES,AX     
     
-    MOV DL,0
-    OR DL,0
-    outputString msgInput  
-    inputString max  
-    fixString string1 
+    MOV DL,0      
+    OR DL,0     
+    outputString msgNotice1  
+    inputString select
+    fixString select
+    ;outputString msgInput  
+    ;inputString max  
+    ;fixString string1 
     
-    outputString enterLine  
-    outputString msgInput        
-    inputString max  
-    fixString string2    
-    
-    
-    outputString enterLine  
-    outputString msgInput        
-    inputString max  
-    fixString stringReplace 
+   ; outputString enterLine  
+    ;outputString msgInput        
+    ;inputString max  
+    ;fixString string2    
     
     
-    outputString enterLine
-    outputString msgOutput
+    ;outputString enterLine  
+    ;outputString msgInput        
+   ; inputString max  
+    ;fixString stringReplace 
+    
+    
+    ;outputString enterLine
+   ; outputString msgOutput
     
     
     
@@ -570,7 +593,7 @@ start:
     ;replaceString string1,string2,stringReplace
     
     
-    insertChar string1,wordInsert,5    
+    ;insertChar string1,wordInsert,5    
    
     ;deleteChar string1,25
     
