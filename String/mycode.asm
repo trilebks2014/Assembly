@@ -14,14 +14,19 @@ ENDM
 fixString MACRO string ;used to delete char not sense of string value
     
     XOR CX,CX
-    MOV CL,length
+    MOV CL,length     
+    MOV BX,CX
+    MOV string[BX],'$'
     CLD    ; Clear flag
     LEA SI,buff
     LEA DI,string  
-    REP MOVSB
+    REP MOVSB     
+    
+    
 ENDM
               
-searchCharString MACRO string,findChar,result
+searchCharString MACRO string,findChar,result  
+    LOCAL exit,totalexit,searchLoop,found,loopsave,notfound
     MOV BX,0
     MOV CX,0
     searchLoop:
@@ -61,7 +66,7 @@ searchCharString MACRO string,findChar,result
 ENDM
 
 searchStringinString MACRO string1, string2 , result
-    
+    LOCAL exit,totalexit,searchLoop,checkNextChar,loopcheckNextChar,save,loopsave,notfound
     MOV BX,0
     MOV CX,0
     searchLoop:
@@ -91,8 +96,10 @@ searchStringinString MACRO string1, string2 , result
            JMP searchLoop
        save:    
             
-            MOV AX,temp    
-            MOV BX,0 
+            MOV AX,temp  
+            INC AX  
+            MOV BX,0    
+            
        loopsave:  
             MOV DX,0
             MOV CX,10
@@ -118,7 +125,8 @@ searchStringinString MACRO string1, string2 , result
 
 ENDM
 
-reverseString MACRO string1, string2
+reverseString MACRO string1, string2      
+    local pushString,setBXandPopString,popString
     MOV BX,0
     MOV CX,0
     pushString:
@@ -141,7 +149,8 @@ reverseString MACRO string1, string2
 ENDM
 
 
-copyString MACRO string1,string2  
+copyString MACRO string1,string2     
+    LOCAL exit,copyloop
     MOV BX,0
     copyloop:
         CMP string1[bx],'$'
@@ -150,11 +159,13 @@ copyString MACRO string1,string2
         MOV string2[bx],DL
         INC BX
         JMP copyloop
-    exit:
+    exit:  
+    MOV string2[bx],'$'
 
 ENDM  
 
-lengthString MACRO string,length
+lengthString MACRO string,length 
+    local lengthloop,save,loopsave,exit
     MOV BX,0
     lengthloop:
         CMP string[bx],'$'
@@ -182,7 +193,8 @@ lengthString MACRO string,length
 ENDM    
 
 
-upperString MACRO string
+upperString MACRO string  
+    local upperloop,exit,notchange
     MOV BX,0
     upperloop:
     CMP string[bx],'$'
@@ -199,6 +211,7 @@ upperString MACRO string
 ENDM  
 
 lowerString MACRO string
+    local  lowerloop,notchange1,exit
     MOV BX,0
     lowerloop:
     CMP string[bx],'$'
@@ -215,7 +228,8 @@ lowerString MACRO string
 ENDM
  
 
-catString MACRO string1,string2
+catString MACRO string1,string2  
+    local catloop1,next,catloop2,exit
     MOV BX,0
     catloop1:
     CMP string1[bx],'$'
@@ -242,7 +256,7 @@ catString MACRO string1,string2
 ENDM   
     
 compareLengthString MACRO string1,string2
-    
+    local lengthloop,save,lengthloop1,save1,length1Longer,equalLength,exit
     MOV BX,0
     lengthloop:
         CMP string1[bx],'$'
@@ -274,7 +288,8 @@ compareLengthString MACRO string1,string2
   
 ENDM
 
-compareString MACRO string1,string2  
+compareString MACRO string1,string2
+    local lengthloop,lengthloop1,save,save1,length1Longer,equalLength,exit  
     MOV BX,0
     lengthloop:
         CMP string1[bx],'$'
@@ -324,7 +339,8 @@ compareString MACRO string1,string2
 ENDM
  
  
-repaceWord MACRO string,word,wordReplace
+repaceWord MACRO string,word,wordReplace   
+    local searchLoop,found,exit
     MOV BX,0
     MOV CX,0
     searchLoop:
@@ -344,7 +360,8 @@ repaceWord MACRO string,word,wordReplace
         
 ENDM 
 
-replaceString MACRO string1,string2,stringReplace
+replaceString MACRO string1,string2,stringReplace   
+    local searchLoop,checkNextChar,loopcheckNextChar,replaceString,replaceLoop,exit
     MOV BX,0
     MOV CX,0
     searchLoop:
@@ -388,7 +405,8 @@ replaceString MACRO string1,string2,stringReplace
     exit:           ;Exit end of MACRO   
 ENDM  
 
-insertChar MACRO string, char, index      
+insertChar MACRO string, char, index   
+   local doneLength,insertloop,lengthloop,done,exit   
    MOV BX,0
     lengthloop:
         CMP string[bx],'$'
@@ -417,7 +435,7 @@ ENDM
 
 
 deleteChar MACRO string, index 
-
+    local deleteCharloop,deleteEndWord,exit 
     MOV BX,index
     DEC BX
     deleteCharloop:       
@@ -437,7 +455,8 @@ deleteChar MACRO string, index
 ENDM
     
     
-deleteString MACRO string, index, lengthToDelete  
+deleteString MACRO string, index, lengthToDelete     
+    mov doneLength,deleteStringloop,addEndString 
   ;  MOV BX,0
  ;   lengthloop:
  ;       CMP string[bx],'$'
@@ -468,7 +487,8 @@ deleteString MACRO string, index, lengthToDelete
 ENDM            
                                     
                                     
-DSEG SEGMENT                 
+DSEG SEGMENT   
+    msgNotice0 DB "-----------------------------------------------",10,13             
     msgNotice1 DB "1.Input String",10,13
     msgNotice2 DB "2.Output String ",10,13  
     msgNotice3 DB "3.Search Char in String",10,13
@@ -478,41 +498,45 @@ DSEG SEGMENT
     msgNotice7 DB "7.Length of String",10,13
     msgNotice8 DB "8.Upper string",10,13
     msgNotice9 DB "9.Lower String" ,10,13
-    msgNotice10 DB "10.Copy String",10,13
-    msgNotice11 DB "11.Cat String"  ,10,13
-    msgNotice12 DB "12.Compare String",10,13
-    msgNotice13 DB "13.Replace word" ,10,13
-    msgNotice14 DB "14.Delete word",10,13
-    msgNotice15 DB "15.Replace string" ,10,13
-    msgNotice16 DB "16.Insert char",10,13    
-    msgNotice17 DB "Select choice ... :   $"
+    msgNotice10 DB "a.Compare Length String",10,13
+    msgNotice11 DB "b.Cat String"  ,10,13
+    msgNotice12 DB "c.Compare String",10,13
+    msgNotice13 DB "d.Replace word" ,10,13
+    msgNotice14 DB "e.Delete char",10,13
+    msgNotice15 DB "f.Delete string" ,10,13
+    msgNotice16 DB "g.Insert char",10,13 
+    msgNotice17 DB "h.Exit",10,13
+    msgNotice18 DB "Select choice ... :   $"
     
     msgString1CMP DB "String1 bigger than String2 $"
-    msgString2CMP DB "String2 bigger than String1 $"
+    msgString2CMP DB "String2 bigger than String1 $"     
+    
     msgStringEqualCMP DB "String1 like the same String2 $"
     msgString1Longer DB "String1 longer than String2 $"
     msgString2Longer DB "String2 longer than String1 $"
     msgStringEqualLonger DB "String 1 and String 2 have the same length $"
     msgInput DB "Input your string: $"
     msgOutput DB "The result is: $"   
-    
+    msgInputChar DB "Input char: $"
     result DB 30 DUP('$') 
     div10 DB 10
     findChar DB 'e'     
     wordReplace DB 'u'  
     wordInsert DB 'k'  
-
+    deletecharr DW '$'
     temp DW 0  
     temp1 DW 0    
     temp2 DW 0 
     length1 DW ?
-    length2 DW ?
+    length2 DW ? 
+    lengthStr DB '$'
     charTemp DB 0
     lengthex1 DW 0
     enterLine DB 10,13,'$' 
     stringReplace DB 30 DUP('$')
     string1 DB 60 DUP('$') 
-    string2 DB 60 DUP('$') 
+    string2 DB 60 DUP('$')  
+    string3 DB 60 DUP('$')
     select DB 60 DUP('$')
         max DB 60
         length DB ?
@@ -529,75 +553,234 @@ start:
     MOV ES,AX     
     
     MOV DL,0      
-    OR DL,0     
-    outputString msgNotice1  
-    inputString select
-    fixString select
-    ;outputString msgInput  
-    ;inputString max  
-    ;fixString string1 
+    OR DL,0   
+        
+    loopselect:  
+    outputString enterLine
+    outputString msgNotice0  
+    inputString max
+    fixString select     
+    cmp select,'1'
+    je select1
+    cmp select,'2'
+    je select2 
+    cmp select,'3'
+    je select3   
+    cmp select,'4'
+    je select4  
+    cmp select,'5'
+    je select5    
+    cmp select,'6'
+    je select6
+    cmp select,'7'
+    je select7 
+    cmp select,'8'
+    je select8 
+    cmp select,'9'
+    je select9 
+    cmp select,'a'
+    je select10
+    cmp select,'b'
+    je select11  
+    cmp select,'c'
+    je select12
+    cmp select,'d'
+    je select13  
+    cmp select,'e'
+    je select14  
+    cmp select,'f'
+    je select15
+    cmp select,'g'
+    je select16  
+    cmp select,'h'
+    je select17  
+                    
+    select1: 
+    outputString enterLine
+    outputString msgInput  
+    inputString max  
+    fixString string1   
     
-   ; outputString enterLine  
-    ;outputString msgInput        
-    ;inputString max  
-    ;fixString string2    
+    jmp loopselect
+            
+    select2:
+    outputString enterLine
+    outputString string1
+    jmp loopselect
+            
+            
+    select3:    
+    outputString enterLine
+    outputString msgInputChar
+    mov ah,01     
+    int 21h
+    mov findChar,al
+    searchCharString string1,findChar,result  
+    outputString enterLine
+    outputString msgOutput
+    outputString result
+    jmp loopselect     
     
+    select4:
+    outputString enterLine
+    outputString msgInput  
+    inputString max  
+    fixString string1
+    outputString enterLine
+    outputString msgInput  
+    inputString max  
+    fixString string2
+    searchStringinString string1,string2,result   
+    reverseString result,result
+    outputString enterLine
+    outputString msgOutput    
+    outputString result     
+    jmp loopselect
     
-    ;outputString enterLine  
-    ;outputString msgInput        
-   ; inputString max  
-    ;fixString stringReplace 
+    select5:
+    reverseString string1,string2   
+    copyString string1, string2
+    outputString string2      
+    jmp loopselect  
     
-    
-    ;outputString enterLine
-   ; outputString msgOutput
-    
-    
-    
-    ;reverseString string1,string2   
-    ;copyString string1, string2
-    ;outputString string2  
-    
-    
-    
-    ;lengthString string1, lengthStr  
-    ;reverseString lengthStr,lengthStr
-    ;outputString lengthStr     
-    
-    
-    ;upperString string1
-    ;outputString string1
-    
-    
-    ;lowerString string1
-    ;outputString string1
-     
-     
-    ;catString string1 string2
-    ;outputString string1
-    
-    ;compareLengthString string1,string2
-    
-    ;compareString string1,string2
-    
-    ;searchCharString string1,findChar,result
-    ;outputString result 
-    
-    ;searchStringinString string1,string2,result   
-    ;reverseString result,result
-    ;outputString result 
-     
-    ;repaceWord string1,findChar,wordReplace      
-    ;outputString string1
-    
-    ;replaceString string1,string2,stringReplace
-    
-    
-    ;insertChar string1,wordInsert,5    
+    select6:
+    copyString string1, string2
+    outputString enterLine
+    outputString msgOutput
+    outputString string2     
+    jmp loopselect 
    
-    ;deleteChar string1,25
+    select7:  
     
-    ;deleteString string1,5,2
+    outputString enterLine
+    outputString msgInput  
+    inputString max  
+    fixString string1    
+    lengthString string1, lengthStr  
+    reverseString lengthStr,lengthStr  
+    outputString enterLine
+    outputString msgOutput   
+    outputString lengthStr 
+    jmp loopselect          
+    
+    select8: 
+    outputString enterLine
+    outputString msgInput  
+    inputString max  
+    fixString string1
+    upperString string1 
+    outputString enterLine
+    outputString msgOutput  
+    outputString string1   
+    jmp loopselect    
+     
+    select9:   
+    outputString enterLine
+    outputString msgInput  
+    inputString max  
+    fixString string1
+    lowerString string1 
+    outputString enterLine   
+    outputString msgOutput  
+    outputString string1   
+    jmp loopselect    
+    
+    
+    select10:
+    outputString enterLine
+    outputString msgInput  
+    inputString max  
+    fixString string1
+    outputString enterLine
+    outputString msgInput  
+    inputString max  
+    fixString string2    
+    compareLengthString string1,string2
+    jmp loopselect   
+    
+    select11:
+    outputString enterLine
+    outputString msgInput  
+    inputString max  
+    fixString string1
+    outputString enterLine
+    outputString msgInput  
+    inputString max  
+    fixString string2    
+    catString string1 string2
+    outputString string1    
+    jmp loopselect   
+    select12:
+    outputString enterLine
+    outputString msgInput  
+    inputString max  
+    fixString string1
+    outputString enterLine
+    outputString msgInput  
+    inputString max  
+    fixString string2 
+    compareString string1,string2 
+    jmp loopselect   
+    
+    select13:     
+    outputString enterLine
+    outputString msgInput  
+    inputString max  
+    fixString string1    
+    outputString enterLine
+    outputString msgInputChar
+    mov ah,01     
+    int 21h
+    mov findChar,al    
+    repaceWord string1,findChar,wordReplace      
+    outputString string1  
+    jmp loopselect   
+    
+    select14:  
+    outputString enterLine
+    outputString msgInput  
+    inputString max  
+    fixString string1    
+    outputString enterLine
+    outputString msgInputChar
+    mov ah,01     
+    int 21h    
+    mov ah,0
+    mov deletecharr,ax 
+    deleteChar string1,deletecharr
+    outputString enterLine
+    outputString msgOutput
+    outputString string1
+    jmp loopselect   
+        
+    
+    
+    select15: 
+    outputString enterLine
+    outputString msgInput  
+    inputString max  
+    fixString string1
+    deleteString string1,5,2
+    outputString enterLine
+    outputString msgOutput
+    outputString string1
+    jmp loopselect   
+        
+        
+    select16:     
+    outputString enterLine
+    outputString msgInput  
+    inputString max  
+    fixString string1  
+    outputString enterLine
+    outputString msgInputChar
+    mov ah,01     
+    int 21h
+    mov wordInsert,al  
+    insertChar string1,wordInsert,5 
+    jmp loopselect
+    select17:  
+    
     
     MOV AH,4CH
     INT 21h
